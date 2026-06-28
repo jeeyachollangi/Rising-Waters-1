@@ -804,3 +804,82 @@ a {
     }
 }
 
+/* Website Preloader Styles */
+.preloader {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: var(--gradient-primary);
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.5s ease, visibility 0.5s ease;
+}
+
+.preloader-content {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.25rem;
+}
+
+.preloader-icon {
+    font-size: 3.5rem;
+    color: #ffffff;
+    animation: bounce 2s infinite ease-in-out;
+}
+
+.preloader-bar {
+    width: 200px;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
+    overflow: hidden;
+    margin: 0.5rem 0;
+}
+
+.preloader-progress {
+    width: 0%;
+    height: 100%;
+    background: #ffffff;
+    border-radius: 10px;
+    animation: progressFill 1.2s ease-in-out forwards;
+}
+
+.preloader-title {
+    font-size: 2rem;
+    font-weight: 800;
+    color: #ffffff;
+    font-family: var(--font-heading);
+}
+
+.preloader-subtitle {
+    font-size: 0.9rem;
+    color: #e0f2fe;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+}
+
+@keyframes progressFill {
+    0% {
+        width: 0%;
+    }
+    100% {
+        width: 100%;
+    }
+}
+
+@keyframes bounce {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-15px);
+    }
+}
+
+

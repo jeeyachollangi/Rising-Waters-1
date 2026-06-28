@@ -1,5 +1,30 @@
 document.addEventListener('DOMContentLoaded', () => {
     // ----------------------------------------------------
+    // Website Preloader Dismissal
+    // ----------------------------------------------------
+    const preloader = document.getElementById('preloader');
+    if (preloader) {
+        // Wait for page to finish loading fully, then fade out preloader
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                preloader.style.opacity = '0';
+                setTimeout(() => {
+                    preloader.style.display = 'none';
+                }, 500);
+            }, 1000);
+        });
+
+        // Safe fallback in case load event already fired or is delayed
+        setTimeout(() => {
+            if (preloader.style.display !== 'none') {
+                preloader.style.opacity = '0';
+                setTimeout(() => {
+                    preloader.style.display = 'none';
+                }, 500);
+            }
+        }, 3000);
+    }
+    // ----------------------------------------------------
     // Form Input Validation & Verification
     // ----------------------------------------------------
     const predictForm = document.getElementById('predict-form');
