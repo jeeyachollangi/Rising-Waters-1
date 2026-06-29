@@ -1,155 +1,121 @@
 import os
-import datetime
-from flask import Flask, render_template, request, redirect, url_for, session
-import numpy as np
-import joblib
+from flask import Flask, render_template, request, redirect, url_for
+import pandas as pd
+from joblib import load
 
+# Initialize Flask app
 app = Flask(__name__)
-app.secret_key = "rising_waters_secret_session_key_1298"
 
-# Define paths for models
-MODEL_PATH = os.path.join("models", "model.pkl")
-SCALER_PATH = os.path.join("models", "scaler.pkl")
+# Load model and scaler from root directory as specified in PDF
+try:
+    model = load('floods.save')
+    sc = load('transform.save')
+    print("Successfully loaded model (floods.save) and scaler (transform.save)")
+except Exception as e:
+    model, sc = None, None
+    print(f"Error loading model assets from root directory: {e}")
 
-# Helper function to check if models are loaded
-def load_ml_assets():
-    if not os.path.exists(MODEL_PATH) or not os.path.exists(SCALER_PATH):
-        return None, None
-    try:
-        model = joblib.load(MODEL_PATH)
-        scaler = joblib.load(SCALER_PATH)
-        return model, scaler
-    except Exception as e:
-        print(f"Error loading models: {e}")
-        return None, None
+# Helper to verify models are loaded
+def check_assets():
+    global model, sc
+    if model is None or sc is None:
+        try:
+            model = load('floods.save')
+            sc = load('transform.save')
+        except Exception:
+            return False
+    return True
 
 # ----------------------------------------------------
-# Route 1: Home Page
+# Route 1: Home Page (home.html)
 # ----------------------------------------------------
 @app.route('/')
-def index():
-    return render_template('index.html')
+def home():
+    return render_template('home.html')
 
 # ----------------------------------------------------
-# Route 2: Prediction Page (GET/POST)
+# Route 2: Predict Input Form (index.html) (GET) and Submission (POST)
 # ----------------------------------------------------
 @app.route('/predict', methods=['GET', 'POST'])
 def predict():
-    # Retrieve history from session
-    if 'history' not in session:
-        session['history'] = []
-        
     if request.method == 'POST':
-        # Load models
-        model, scaler = load_ml_assets()
-        if model is None or scaler is None:
-            return render_template('predict.html', 
-                                   error_msg="Machine Learning models are not available. Please run train.py first.", 
-                                   history=session['history'])
-        
+        if not check_assets():
+            return render_template('index.html', error_msg="Prediction models are not loaded. Run train.py first.")
+            
         try:
-            # 1. Retrieve and Parse Inputs
-            annual_rainfall_raw = request.form.get('annual_rainfall')
-            seasonal_rainfall_raw = request.form.get('seasonal_rainfall')
-            cloud_visibility_raw = request.form.get('cloud_visibility')
-            meteorological_parameters_raw = request.form.get('meteorological_parameters')
+            # 1. Retrieve inputs from form
+            cloud_cover_raw = request.form.get('cloud_cover')
+            annual_raw = request.form.get('annual_rainfall')
+            jan_feb_raw = request.form.get('jan_feb')
+            mar_may_raw = request.form.get('mar_may')
+            jun_sep_raw = request.form.get('jun_sep')
             
-            # Input presence check
-            if not all([annual_rainfall_raw, seasonal_rainfall_raw, cloud_visibility_raw, meteorological_parameters_raw]):
-                return render_template('predict.html', 
-                                       error_msg="All form fields are required.", 
-                                       history=session['history'])
+            # Form check
+            if not all([cloud_cover_raw, annual_raw, jan_feb_raw, mar_may_raw, jun_sep_raw]):
+                return render_template('index.html', error_msg="All meteorological parameters must be provided.")
             
-            annual_rainfall = float(annual_rainfall_raw)
-            seasonal_rainfall = float(seasonal_rainfall_raw)
-            cloud_visibility = float(cloud_visibility_raw)
-            meteorological_parameters = float(meteorological_parameters_raw)
+            # Convert to floats
+            cloud_cover = float(cloud_cover_raw)
+            annual = float(annual_raw)
+            jan_feb = float(jan_feb_raw)
+            mar_may = float(mar_may_raw)
+            jun_sep = float(jun_sep_raw)
             
-            # 2. Input Validation Bounds
+            # Simple logical checks
             errors = []
-            if annual_rainfall < 0 or annual_rainfall > 15000:
-                errors.append("Annual Rainfall must be between 0 and 15,000 mm.")
-            if seasonal_rainfall < 0 or seasonal_rainfall > 10000:
-                errors.append("Seasonal Rainfall must be between 0 and 10,000 mm.")
-            if seasonal_rainfall > annual_rainfall:
-                errors.append("Seasonal Rainfall cannot exceed Annual Rainfall.")
-            if cloud_visibility < 0 or cloud_visibility > 100:
-                errors.append("Cloud Visibility must be a percentage between 0% and 100%.")
-            if meteorological_parameters < 0 or meteorological_parameters > 100:
-                errors.append("Weather parameter index must be between 0 and 100.")
+            if cloud_cover < 0 or cloud_cover > 100:
+                errors.append("Cloud Cover must be between 0% and 100%.")
+            if annual < 0 or annual > 20000:
+                errors.append("Annual Rainfall must be between 0 and 20,000 mm.")
+            if jan_feb < 0 or mar_may < 0 or jun_sep < 0:
+                errors.append("Rainfall values cannot be negative.")
+            if (jan_feb + mar_may + jun_sep) > annual:
+                errors.append("Sum of seasonal rainfall cannot exceed Annual Rainfall.")
                 
             if errors:
-                return render_template('predict.html', 
-                                       error_msg=" | ".join(errors), 
-                                       history=session['history'])
+                return render_template('index.html', error_msg=" | ".join(errors))
             
-            # 3. Preprocess and Scale Data
-            # Note: Features list in train.py is ['Annual_Rainfall', 'Cloud_Visibility', 'Seasonal_Rainfall', 'Meteorological_Parameters']
-            import pandas as pd
-            input_features = pd.DataFrame([{
-                'Annual_Rainfall': annual_rainfall,
-                'Cloud_Visibility': cloud_visibility,
-                'Seasonal_Rainfall': seasonal_rainfall,
-                'Meteorological_Parameters': meteorological_parameters
+            # 2. Structure into DataFrame matching train.py order
+            input_df = pd.DataFrame([{
+                'Cloud Cover': cloud_cover,
+                'ANNUAL': annual,
+                'Jan-Feb': jan_feb,
+                'Mar-May': mar_may,
+                'Jun-Sep': jun_sep
             }])
-            scaled_features = scaler.transform(input_features)
             
-            # 4. Generate Prediction
-            prediction_array = model.predict(scaled_features)
-            prediction = int(prediction_array[0])
+            # 3. Transform and predict
+            scaled_features = sc.transform(input_df)
+            prediction = int(model.predict(scaled_features)[0])
             
-            # 5. Save prediction in Session History (limit to 10 records for size)
-            timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-            history_item = {
-                'date': timestamp,
-                'annual_rainfall': annual_rainfall,
-                'cloud_visibility': cloud_visibility,
-                'prediction': prediction
-            }
-            # Append and slice
-            history_list = session['history']
-            history_list.insert(0, history_item)
-            session['history'] = history_list[:10]
-            
-            # Store latest result parameters to render in /result
-            session['latest_prediction'] = {
-                'prediction': prediction,
-                'inputs': {
-                    'annual_rainfall': annual_rainfall,
-                    'seasonal_rainfall': seasonal_rainfall,
-                    'cloud_visibility': cloud_visibility,
-                    'meteorological_parameters': meteorological_parameters
-                }
-            }
-            
-            # Redirect to result route (PRG pattern)
-            return redirect(url_for('result'))
-            
+            # 4. Redirect based on prediction
+            if prediction == 1:
+                return redirect(url_for('chance'))
+            else:
+                return redirect(url_for('no_chance'))
+                
         except ValueError:
-            return render_template('predict.html', 
-                                   error_msg="Please enter valid numeric values for all parameters.", 
-                                   history=session['history'])
+            return render_template('index.html', error_msg="Please enter valid numerical values for all parameters.")
         except Exception as e:
-            return render_template('predict.html', 
-                                   error_msg=f"An error occurred during calculation: {str(e)}", 
-                                   history=session['history'])
+            return render_template('index.html', error_msg=f"An error occurred during prediction: {str(e)}")
             
-    # GET request
-    return render_template('predict.html', history=session['history'])
+    # GET request: render the form template
+    return render_template('index.html')
 
 # ----------------------------------------------------
-# Route 3: Result Page
+# Route 3: Chance of Flood (chance.html)
 # ----------------------------------------------------
-@app.route('/result')
-def result():
-    latest = session.get('latest_prediction')
-    if not latest:
-        return redirect(url_for('predict'))
-        
-    return render_template('result.html', 
-                           prediction=latest['prediction'], 
-                           inputs=latest['inputs'])
+@app.route('/chance')
+def chance():
+    return render_template('chance.html')
 
-if __name__ == "__main__":
-    # Standard Flask port 5000 execution
-    app.run(debug=True, host="0.0.0.0", port=5000)
+# ----------------------------------------------------
+# Route 4: No Chance of Flood (no_chance.html)
+# ----------------------------------------------------
+@app.route('/no_chance')
+def no_chance():
+    return render_template('no_chance.html')
+
+if __name__ == '__main__':
+    # Standard Flask listener
+    app.run(debug=True, port=5000)

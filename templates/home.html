@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rising Waters - Advanced Flood Prediction System</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+    <!-- Header / Navbar -->
+    <header>
+        <div class="nav-container">
+            <a href="/" class="logo" id="logo">
+                <i class="fa-solid fa-water"></i> Floods Prediction
+            </a>
+            <ul class="nav-links">
+                <li><a href="/" class="active" id="nav-home">Home</a></li>
+                <li><a href="/predict" id="nav-predict">Predict Floods</a></li>
+            </ul>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="container animate-fade-in">
+        
+        <!-- Banner Card -->
+        <div class="banner-card">
+            <div class="banner-img-container">
+                <img src="{{ url_for('static', filename='images/flood_banner.png') }}" alt="Kerala Floods Scene" class="banner-img">
+                <div class="banner-overlay">
+                    <h1>Introduction</h1>
+                    <p>Flood forecasting is the use of forecasted precipitation and streamflow data in rainfall-runoff and streamflow routing models to forecast flow rates and water levels for periods ranging from a few hours to days ahead, depending on the size of the watershed or river basin. Flood forecasting can also make use of forecasts of precipitation in an attempt to extend the lead-time available. Flood forecasting is an important component of flood warning, where the distinction between the two is that the outcome of flood forecasting is a set of forecast time-profiles of channel flows or river levels at various locations, while "flood warning" is the task of making use of these forecasts to tell decisions on warnings of floods. Real-time flood forecasting at regional area can be done in seconds to minutes using the technology of artificial neural network. Effective real-time flood forecasting models could be useful for early warning and disaster prevention.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Project Structure & Details Section -->
+        <div class="info-section">
+            <h2>System Architecture</h2>
+            <p style="color: var(--text-muted); margin-bottom: 2rem;">Our flood forecasting system processes real-time weather and seasonal meteorological data to yield swift, high-accuracy classification boundaries.</p>
+            
+            <div class="info-grid">
+                <div class="info-card">
+                    <h3><i class="fa-solid fa-database" style="color: var(--primary);"></i> Meteorological Input</h3>
+                    <p>Analyzes 5 critical predictors: Cloud Cover, Annual Rainfall, Jan-Feb Rainfall, Mar-May Rainfall, and Jun-Sep monsoon totals derived from 115 years of Kerala climate measurements.</p>
+                </div>
+                <div class="info-card">
+                    <h3><i class="fa-solid fa-gears" style="color: var(--secondary);"></i> Scaling Pipeline</h3>
+                    <p>Real-time input variables are scaled using a fitted StandardScaler matching the training parameters to prevent variance skew.</p>
+                </div>
+                <div class="info-card">
+                    <h3><i class="fa-solid fa-microchip" style="color: #FFD600;"></i> Classification Core</h3>
+                    <p>Leverages a trained Gradient Boosting/XGBoost ensemble classifier that provides robust generalization and a 96.55% accuracy rate.</p>
+                </div>
+            </div>
+            
+            <div style="margin-top: 3rem; text-align: center;">
+                <a href="/predict" class="btn btn-primary" style="width: auto; padding: 1rem 3rem;" id="cta-predict">
+                    Launch Prediction Panel <i class="fa-solid fa-chevron-right"></i>
+                </a>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2026 Rising Waters - Flood Prediction System. Developed for Meteorologists & Disaster Management Authorities.</p>
+    </footer>
+
+</body>
+</html>

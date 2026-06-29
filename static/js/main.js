@@ -1,106 +1,94 @@
 document.addEventListener('DOMContentLoaded', () => {
     // ----------------------------------------------------
-    // Website Preloader Dismissal
-    // ----------------------------------------------------
-    const preloader = document.getElementById('preloader');
-    if (preloader) {
-        // Wait for page to finish loading fully, then fade out preloader
-        window.addEventListener('load', () => {
-            setTimeout(() => {
-                preloader.style.opacity = '0';
-                setTimeout(() => {
-                    preloader.style.display = 'none';
-                }, 500);
-            }, 1000);
-        });
-
-        // Safe fallback in case load event already fired or is delayed
-        setTimeout(() => {
-            if (preloader.style.display !== 'none') {
-                preloader.style.opacity = '0';
-                setTimeout(() => {
-                    preloader.style.display = 'none';
-                }, 500);
-            }
-        }, 3000);
-    }
-    // ----------------------------------------------------
     // Form Input Validation & Verification
     // ----------------------------------------------------
     const predictForm = document.getElementById('predict-form');
     if (predictForm) {
+        const cloudInput = document.getElementById('cloud_cover');
         const annualInput = document.getElementById('annual_rainfall');
-        const seasonalInput = document.getElementById('seasonal_rainfall');
-        const cloudInput = document.getElementById('cloud_visibility');
-        const metInput = document.getElementById('meteorological_parameters');
+        const janFebInput = document.getElementById('jan_feb');
+        const marMayInput = document.getElementById('mar_may');
+        const junSepInput = document.getElementById('jun_sep');
         
         predictForm.addEventListener('submit', (e) => {
             let isValid = true;
-            let errorMessage = "";
+            let errors = [];
 
             // Parse values
-            const annualVal = parseFloat(annualInput.value);
-            const seasonalVal = parseFloat(seasonalInput.value);
             const cloudVal = parseFloat(cloudInput.value);
-            const metVal = parseFloat(metInput.value);
+            const annualVal = parseFloat(annualInput.value);
+            const janFebVal = parseFloat(janFebInput.value);
+            const marMayVal = parseFloat(marMayInput.value);
+            const junSepVal = parseFloat(junSepInput.value);
 
-            // Validate Annual Rainfall
-            if (isNaN(annualVal) || annualVal < 0 || annualVal > 15000) {
-                isValid = false;
-                errorMessage += "• Annual Rainfall must be a positive number between 0 and 15,000 mm.\n";
-                annualInput.classList.add('is-invalid');
-            } else {
-                annualInput.classList.remove('is-invalid');
-            }
-
-            // Validate Seasonal Rainfall
-            if (isNaN(seasonalVal) || seasonalVal < 0 || seasonalVal > 10000) {
-                isValid = false;
-                errorMessage += "• Seasonal Rainfall must be a positive number between 0 and 10,000 mm.\n";
-                seasonalInput.classList.add('is-invalid');
-            } else if (seasonalVal > annualVal) {
-                isValid = false;
-                errorMessage += "• Seasonal Rainfall cannot be greater than Annual Rainfall.\n";
-                seasonalInput.classList.add('is-invalid');
-            } else {
-                seasonalInput.classList.remove('is-invalid');
-            }
-
-            // Validate Cloud Visibility
+            // Validate Cloud Cover
             if (isNaN(cloudVal) || cloudVal < 0 || cloudVal > 100) {
                 isValid = false;
-                errorMessage += "• Cloud Visibility must be a percentage value between 0% and 100%.\n";
-                cloudInput.classList.add('is-invalid');
+                errors.push("Cloud Cover must be a percentage between 0% and 100%.");
+                cloudInput.style.borderColor = "var(--danger)";
             } else {
-                cloudInput.classList.remove('is-invalid');
+                cloudInput.style.borderColor = "";
             }
 
-            // Validate Meteorological Parameters
-            if (isNaN(metVal) || metVal < 0 || metVal > 100) {
+            // Validate Annual Rainfall
+            if (isNaN(annualVal) || annualVal < 0 || annualVal > 20000) {
                 isValid = false;
-                errorMessage += "• Meteorological Index must be a scale value between 0 and 100.\n";
-                metInput.classList.add('is-invalid');
+                errors.push("Annual Rainfall must be a positive number between 0 and 20,000 mm.");
+                annualInput.style.borderColor = "var(--danger)";
             } else {
-                metInput.classList.remove('is-invalid');
+                annualInput.style.borderColor = "";
             }
 
-            // Prevent submit if invalid
+            // Validate negative checks
+            if (isNaN(janFebVal) || janFebVal < 0) {
+                isValid = false;
+                errors.push("Jan-Feb Rainfall cannot be negative.");
+                janFebInput.style.borderColor = "var(--danger)";
+            } else {
+                janFebInput.style.borderColor = "";
+            }
+
+            if (isNaN(marMayVal) || marMayVal < 0) {
+                isValid = false;
+                errors.push("March-May Rainfall cannot be negative.");
+                marMayInput.style.borderColor = "var(--danger)";
+            } else {
+                marMayInput.style.borderColor = "";
+            }
+
+            if (isNaN(junSepVal) || junSepVal < 0) {
+                isValid = false;
+                errors.push("June-September Rainfall cannot be negative.");
+                junSepInput.style.borderColor = "var(--danger)";
+            } else {
+                junSepInput.style.borderColor = "";
+            }
+
+            // Validate logical sum
+            if (isValid && (janFebVal + marMayVal + junSepVal) > annualVal) {
+                isValid = false;
+                errors.push("Sum of seasonal rainfall (Jan-Feb, March-May, June-September) cannot exceed the total Annual Rainfall.");
+                janFebInput.style.borderColor = "var(--danger)";
+                marMayInput.style.borderColor = "var(--danger)";
+                junSepInput.style.borderColor = "var(--danger)";
+            }
+
+            // Prevent submit if invalid, show premium dynamic error alert
             if (!isValid) {
                 e.preventDefault();
-                alert("Please correct the following errors:\n\n" + errorMessage);
-            } else {
-                e.preventDefault(); // Prevent instant submit
                 
-                // Show the beautiful loading screen overlay
-                const loadingOverlay = document.getElementById('loading-overlay');
-                if (loadingOverlay) {
-                    loadingOverlay.style.display = 'flex';
+                // Check if alert element already exists
+                let alertBox = document.getElementById('alert-error');
+                if (!alertBox) {
+                    alertBox = document.createElement('div');
+                    alertBox.id = 'alert-error';
+                    alertBox.className = 'alert-error';
+                    // Insert before form fields
+                    predictForm.parentNode.insertBefore(alertBox, predictForm);
                 }
                 
-                // Trigger form submission after 1.5 seconds to let the user see the analysis sequence
-                setTimeout(() => {
-                    predictForm.submit();
-                }, 1500);
+                alertBox.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i> <span>${errors.join(" | ")}</span>`;
+                alertBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
             }
         });
     }

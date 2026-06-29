@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rising Waters - Prediction Alert</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+    <!-- Header / Navbar -->
+    <header>
+        <div class="nav-container">
+            <a href="/" class="logo" id="logo">
+                <i class="fa-solid fa-water"></i> Floods Prediction
+            </a>
+            <ul class="nav-links">
+                <li><a href="/" id="nav-home">Home</a></li>
+                <li><a href="/predict" class="active" id="nav-predict">Predict Floods</a></li>
+            </ul>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="container animate-fade-in">
+        
+        <!-- Result Card: Danger -->
+        <div class="result-card danger">
+            <div class="result-icon">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+            </div>
+            
+            <h1 class="result-title">Chance of Flood!</h1>
+            
+            <p class="result-desc">
+                <strong>WARNING:</strong> Meteorological parameters and monsoon indexes indicate a high probability of flood occurrence. Immediate alerts must be dispatched to local disaster relief operations and flood mitigation units.
+            </p>
+            
+            <div class="action-buttons">
+                <a href="/predict" class="btn btn-primary" style="width: auto;" id="btn-repredict">
+                    <i class="fa-solid fa-rotate-left"></i> Run Another Prediction
+                </a>
+                <a href="/" class="btn btn-secondary" id="btn-back-home">
+                    <i class="fa-solid fa-house"></i> Home
+                </a>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2026 Rising Waters - Flood Prediction System. Developed for Meteorologists & Disaster Management Authorities.</p>
+    </footer>
+
+</body>
+</html>

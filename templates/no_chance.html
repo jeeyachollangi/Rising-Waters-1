@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rising Waters - Prediction Safe</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+    <!-- Header / Navbar -->
+    <header>
+        <div class="nav-container">
+            <a href="/" class="logo" id="logo">
+                <i class="fa-solid fa-water"></i> Floods Prediction
+            </a>
+            <ul class="nav-links">
+                <li><a href="/" id="nav-home">Home</a></li>
+                <li><a href="/predict" class="active" id="nav-predict">Predict Floods</a></li>
+            </ul>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="container animate-fade-in">
+        
+        <!-- Result Card: Safe -->
+        <div class="result-card safe">
+            <div class="result-icon">
+                <i class="fa-solid fa-circle-check"></i>
+            </div>
+            
+            <h1 class="result-title">No Chance of Flood</h1>
+            
+            <p class="result-desc">
+                <strong>STATUS: NORMAL.</strong> Meteorological indicators suggest precipitation and runoff volumes remain within safe limits. No flood hazard is predicted for this scenario. Continue routine weather observation.
+            </p>
+            
+            <div class="action-buttons">
+                <a href="/predict" class="btn btn-primary" style="width: auto;" id="btn-repredict">
+                    <i class="fa-solid fa-rotate-left"></i> Run Another Prediction
+                </a>
+                <a href="/" class="btn btn-secondary" id="btn-back-home">
+                    <i class="fa-solid fa-house"></i> Home
+                </a>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2026 Rising Waters - Flood Prediction System. Developed for Meteorologists & Disaster Management Authorities.</p>
+    </footer>
+
+</body>
+</html>
