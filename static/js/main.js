@@ -89,9 +89,53 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 alertBox.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i> <span>${errors.join(" | ")}</span>`;
                 alertBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            } else {
+                // If form is valid, trigger preloader before browser submits and navigates
+                const preloader = document.getElementById('preloader');
+                if (preloader) {
+                    preloader.classList.remove('fade-out');
+                }
             }
         });
     }
+
+    // ----------------------------------------------------
+    // Preloader and Transition Logic
+    // ----------------------------------------------------
+    const preloader = document.getElementById('preloader');
+    if (preloader) {
+        // Fade out preloader when page is fully loaded
+        window.addEventListener('load', () => {
+            preloader.classList.add('fade-out');
+        });
+
+        // Safe fallback to make sure preloader disappears eventually
+        setTimeout(() => {
+            preloader.classList.add('fade-out');
+        }, 1200);
+    }
+
+    // Intercept click on links for a smooth fade-in page transition
+    const transitionLinks = document.querySelectorAll('a:not([target="_blank"]):not([href^="#"])');
+    transitionLinks.forEach(link => {
+        link.addEventListener('click', (e) => {
+            const href = link.getAttribute('href');
+            // Intercept only internal website paths
+            if (href && !href.startsWith('javascript:') && !href.startsWith('mailto:') && !href.startsWith('tel:')) {
+                e.preventDefault();
+                if (preloader) {
+                    preloader.classList.remove('fade-out');
+                    setTimeout(() => {
+                        window.location.href = href;
+                    }, 400); // matches CSS fade-out duration
+                } else {
+                    window.location.href = href;
+                }
+            }
+        });
+    });
+
+
 
     // Add active class to navigation links based on current path
     const currentPath = window.location.pathname;

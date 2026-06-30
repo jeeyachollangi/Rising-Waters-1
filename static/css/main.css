@@ -619,3 +619,90 @@ footer {
 .log-icon.success {
     color: var(--success);
 }
+
+/* Fullscreen Preloader */
+.preloader {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: var(--bg-dark);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    opacity: 1;
+    visibility: visible;
+    transition: opacity 0.4s cubic-bezier(0.25, 1, 0.5, 1), visibility 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.preloader.fade-out {
+    opacity: 0;
+    visibility: hidden;
+}
+
+.preloader-content {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.preloader-spinner {
+    font-size: 4rem;
+    color: var(--primary);
+    margin-bottom: 1.5rem;
+    filter: drop-shadow(0 0 15px var(--primary-glow));
+}
+
+.preloader-title {
+    font-family: var(--font-outfit);
+    font-size: 2.2rem;
+    font-weight: 800;
+    color: #fff;
+    letter-spacing: 1px;
+    margin-bottom: 0.5rem;
+    text-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+}
+
+.preloader-subtitle {
+    font-family: var(--font-inter);
+    color: var(--text-muted);
+    font-size: 0.95rem;
+    margin-bottom: 2rem;
+}
+
+.preloader-bar {
+    width: 200px;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.preloader-progress {
+    width: 0%;
+    height: 100%;
+    background: linear-gradient(90deg, var(--primary) 0%, var(--secondary) 100%);
+    border-radius: 10px;
+    animation: preloaderAnim 1.6s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+    box-shadow: 0 0 8px var(--primary-glow);
+}
+
+@keyframes preloaderAnim {
+    0% {
+        width: 0%;
+        margin-left: 0;
+    }
+    50% {
+        width: 75%;
+        margin-left: 0;
+    }
+    100% {
+        width: 0%;
+        margin-left: 100%;
+    }
+}
+
