@@ -1,8 +1,9 @@
 # Rising Waters: A Machine Learning Approach to Flood Prediction
 
 An end-to-end Machine Learning web application designed to predict the likelihood of floods using historical weather, precipitation, and cloud visibility parameters. The application assists disaster management authorities and government agencies in identifying flood risks early, enabling timely evacuation planning and efficient resource allocation.
-
 ---
+## 🌐 Live Demo
+Check out the live application here: [**View Rising Waters Live**](https://rising-waters-flood-prediction-4n9n.onrender.com/)
 
 ## 🚀 Key Features
 
